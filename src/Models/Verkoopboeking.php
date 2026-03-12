@@ -7,6 +7,9 @@ use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
+use Jitso\LaravelSnelstart\DataObjects\BtwBoeking;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
+use Jitso\LaravelSnelstart\DataObjects\VerkoopBoekingsRegel;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -17,15 +20,15 @@ use Jitso\LaravelSnelstart\Model;
  * @property bool|null $markering
  * @property string|null $factuurdatum
  * @property string|null $factuurnummer
- * @property array|null $klant
+ * @property Identifier|null $klant
  * @property string|null $omschrijving
  * @property float|null $factuurbedrag
  * @property int|null $betalingstermijn
  * @property array|null $eenmaligeIncassoMachtiging
  * @property array|null $doorlopendeIncassoMachtiging
- * @property array|null $boekingsregels
- * @property array|null $btw
- * @property array|null $documents
+ * @property \Illuminate\Support\Collection<int, VerkoopBoekingsRegel>|null $boekingsregels
+ * @property \Illuminate\Support\Collection<int, BtwBoeking>|null $btw
+ * @property \Illuminate\Support\Collection<int, Identifier>|null $documents
  * @property string|null $uri
  */
 class Verkoopboeking extends Model
@@ -56,6 +59,13 @@ class Verkoopboeking extends Model
         'factuurnummer',
         'klant',
         'boekingsregels',
+    ];
+
+    protected static array $casts = [
+        'klant' => Identifier::class,
+        'boekingsregels' => [VerkoopBoekingsRegel::class],
+        'btw' => [BtwBoeking::class],
+        'documents' => [Identifier::class],
     ];
 
     protected static bool $supportsOData = true;

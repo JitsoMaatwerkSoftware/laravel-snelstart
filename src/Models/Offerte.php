@@ -7,11 +7,14 @@ use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
+use Jitso\LaravelSnelstart\DataObjects\Adres;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
+use Jitso\LaravelSnelstart\DataObjects\VerkooporderRegel;
 use Jitso\LaravelSnelstart\Model;
 
 /**
  * @property string|null $id
- * @property array|null $relatie
+ * @property Identifier|null $relatie
  * @property string|null $procesStatus
  * @property int|null $nummer
  * @property string|null $modifiedOn
@@ -20,15 +23,15 @@ use Jitso\LaravelSnelstart\Model;
  * @property string|null $omschrijving
  * @property string|null $betalingskenmerk
  * @property array|null $incassomachtiging
- * @property array|null $afleveradres
- * @property array|null $factuuradres
+ * @property Adres|null $afleveradres
+ * @property Adres|null $factuuradres
  * @property string|null $verkooporderBtwIngaveModel
- * @property array|null $kostenplaats
- * @property array|null $regels
+ * @property Identifier|null $kostenplaats
+ * @property \Illuminate\Support\Collection<int, VerkooporderRegel>|null $regels
  * @property string|null $memo
  * @property string|null $orderreferentie
  * @property float|null $factuurkorting
- * @property array|null $verkoopfactuur
+ * @property Identifier|null $verkoopfactuur
  * @property float|null $totaalExclusiefBtw
  * @property float|null $totaalInclusiefBtw
  * @property bool|null $isOfferte
@@ -64,6 +67,15 @@ class Offerte extends Model
     protected static array $required = [
         'relatie',
         'datum',
+    ];
+
+    protected static array $casts = [
+        'relatie' => Identifier::class,
+        'afleveradres' => Adres::class,
+        'factuuradres' => Adres::class,
+        'kostenplaats' => Identifier::class,
+        'regels' => [VerkooporderRegel::class],
+        'verkoopfactuur' => Identifier::class,
     ];
 
     protected static bool $supportsOData = true;

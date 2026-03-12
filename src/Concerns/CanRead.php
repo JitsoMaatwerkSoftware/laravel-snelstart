@@ -8,6 +8,7 @@ use Jitso\LaravelSnelstart\Query\Builder;
 
 trait CanRead
 {
+    /** @return Collection<int, static> */
     public static function all(): Collection
     {
         return static::query()->get();
@@ -29,26 +30,31 @@ trait CanRead
         }
     }
 
+    /** @return Builder<static> */
     public static function query(): Builder
     {
         return new Builder(new static);
     }
 
+    /** @return Builder<static> */
     public static function where(string $field, mixed $operator = null, mixed $value = null): Builder
     {
         return static::query()->where($field, $operator, $value);
     }
 
+    /** @return Builder<static> */
     public static function take(int $amount): Builder
     {
         return static::query()->take($amount);
     }
 
+    /** @return Builder<static> */
     public static function skip(int $amount): Builder
     {
         return static::query()->skip($amount);
     }
 
+    /** @return Builder<static> */
     public static function filter(string $rawFilter): Builder
     {
         return static::query()->filter($rawFilter);

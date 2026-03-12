@@ -8,17 +8,21 @@ use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
+use Jitso\LaravelSnelstart\DataObjects\Adres;
 use Jitso\LaravelSnelstart\DataObjects\CustomField;
+use Jitso\LaravelSnelstart\DataObjects\EmailVersturen;
+use Jitso\LaravelSnelstart\DataObjects\ExtraVeld;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
 use Jitso\LaravelSnelstart\Model;
 
 /**
  * @property string|null $id
- * @property array|null $relatiesoort
+ * @property string[]|null $relatiesoort
  * @property string|null $modifiedOn
  * @property int|null $relatiecode
  * @property string|null $naam
- * @property array|null $vestigingsAdres
- * @property array|null $correspondentieAdres
+ * @property Adres|null $vestigingsAdres
+ * @property Adres|null $correspondentieAdres
  * @property string|null $telefoon
  * @property string|null $mobieleTelefoon
  * @property string|null $email
@@ -33,22 +37,22 @@ use Jitso\LaravelSnelstart\Model;
  * @property string|null $oin
  * @property string|null $websiteUrl
  * @property string|null $aanmaningsoort
- * @property array|null $offerteEmailVersturen
- * @property array|null $bevestigingsEmailVersturen
- * @property array|null $factuurEmailVersturen
- * @property array|null $aanmaningEmailVersturen
- * @property array|null $offerteAanvraagEmailVersturen
- * @property array|null $bestellingEmailVersturen
+ * @property EmailVersturen|null $offerteEmailVersturen
+ * @property EmailVersturen|null $bevestigingsEmailVersturen
+ * @property EmailVersturen|null $factuurEmailVersturen
+ * @property EmailVersturen|null $aanmaningEmailVersturen
+ * @property EmailVersturen|null $offerteAanvraagEmailVersturen
+ * @property EmailVersturen|null $bestellingEmailVersturen
  * @property bool|null $ublBestandAlsBijlage
  * @property string|null $iban
  * @property string|null $bic
  * @property string|null $incassoSoort
- * @property array|null $factuurRelatie
+ * @property Identifier|null $factuurRelatie
  * @property string|null $inkoopBoekingenUri
  * @property string|null $verkoopBoekingenUri
- * @property array|null $documents
+ * @property \Illuminate\Support\Collection<int, Identifier>|null $documents
  * @property string|null $uri
- * @property array|null $extraVeldenKlant
+ * @property \Illuminate\Support\Collection<int, ExtraVeld>|null $extraVeldenKlant
  */
 class Relatie extends Model
 {
@@ -86,6 +90,20 @@ class Relatie extends Model
     ];
 
     protected static array $required = [];
+
+    protected static array $casts = [
+        'vestigingsAdres' => Adres::class,
+        'correspondentieAdres' => Adres::class,
+        'offerteEmailVersturen' => EmailVersturen::class,
+        'bevestigingsEmailVersturen' => EmailVersturen::class,
+        'factuurEmailVersturen' => EmailVersturen::class,
+        'aanmaningEmailVersturen' => EmailVersturen::class,
+        'offerteAanvraagEmailVersturen' => EmailVersturen::class,
+        'bestellingEmailVersturen' => EmailVersturen::class,
+        'factuurRelatie' => Identifier::class,
+        'documents' => [Identifier::class],
+        'extraVeldenKlant' => [ExtraVeld::class],
+    ];
 
     use CanCreate;
     use CanDelete;

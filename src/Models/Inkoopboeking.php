@@ -7,6 +7,9 @@ use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
+use Jitso\LaravelSnelstart\DataObjects\BtwBoeking;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
+use Jitso\LaravelSnelstart\DataObjects\InkoopBoekingsRegel;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -17,12 +20,12 @@ use Jitso\LaravelSnelstart\Model;
  * @property bool|null $markering
  * @property string|null $factuurdatum
  * @property string|null $factuurnummer
- * @property array|null $leverancier
+ * @property Identifier|null $leverancier
  * @property string|null $omschrijving
  * @property float|null $factuurbedrag
- * @property array|null $boekingsregels
- * @property array|null $btw
- * @property array|null $documents
+ * @property \Illuminate\Support\Collection<int, InkoopBoekingsRegel>|null $boekingsregels
+ * @property \Illuminate\Support\Collection<int, BtwBoeking>|null $btw
+ * @property \Illuminate\Support\Collection<int, Identifier>|null $documents
  * @property string|null $uri
  */
 class Inkoopboeking extends Model
@@ -51,6 +54,13 @@ class Inkoopboeking extends Model
         'factuurnummer',
         'leverancier',
         'boekingsregels',
+    ];
+
+    protected static array $casts = [
+        'leverancier' => Identifier::class,
+        'boekingsregels' => [InkoopBoekingsRegel::class],
+        'btw' => [BtwBoeking::class],
+        'documents' => [Identifier::class],
     ];
 
     public static function endpoint(): string

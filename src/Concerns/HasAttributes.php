@@ -2,6 +2,9 @@
 
 namespace Jitso\LaravelSnelstart\Concerns;
 
+use Illuminate\Support\Collection;
+use Jitso\LaravelSnelstart\DataObjects\DataObject;
+
 trait HasAttributes
 {
     protected array $attributes = [];
@@ -14,9 +17,18 @@ trait HasAttributes
     /** @var string[] Fields required when creating this model. */
     protected static array $required = [];
 
+    /** @var array<string, class-string<DataObject>|array{class-string<DataObject>}> */
+    protected static array $casts = [];
+
     public function getAttribute(string $key): mixed
     {
-        return $this->attributes[$key] ?? null;
+        $value = $this->attributes[$key] ?? null;
+
+        if ($value !== null && is_array($value) && isset(static::$casts[$key])) {
+            return $this->castAttribute(static::$casts[$key], $value);
+        }
+
+        return $value;
     }
 
     public function setAttribute(string $key, mixed $value): static
@@ -66,7 +78,16 @@ trait HasAttributes
 
     public function toArray(): array
     {
-        return $this->attributes;
+        return array_map(function ($value) {
+            if ($value instanceof DataObject) {
+                return $value->toArray();
+            }
+            if ($value instanceof Collection) {
+                return $value->map(fn ($item) => $item instanceof DataObject ? $item->toArray() : $item)->all();
+            }
+
+            return $value;
+        }, $this->attributes);
     }
 
     public function toJson($options = 0): string
@@ -92,6 +113,20 @@ trait HasAttributes
     public function __unset(string $key): void
     {
         unset($this->attributes[$key]);
+    }
+
+    /**
+     * @param class-string<DataObject>|array{class-string<DataObject>} $cast
+     */
+    protected function castAttribute(string|array $cast, array $value): mixed
+    {
+        if (is_array($cast)) {
+            $class = $cast[0];
+
+            return collect($class::collection($value));
+        }
+
+        return $cast::fromArray($value);
     }
 
     protected static function guardFillable(array $attributes): void

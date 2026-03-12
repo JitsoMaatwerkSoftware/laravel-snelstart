@@ -7,6 +7,10 @@ use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
+use Jitso\LaravelSnelstart\DataObjects\BoekingVerantwoordingsRegel;
+use Jitso\LaravelSnelstart\DataObjects\BtwBoekingsRegel;
+use Jitso\LaravelSnelstart\DataObjects\GrootboekBoekingsRegel;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -17,13 +21,13 @@ use Jitso\LaravelSnelstart\Model;
  * @property string|null $boekstuk
  * @property bool|null $gewijzigdDoorAccountant
  * @property string|null $omschrijving
- * @property array|null $grootboekBoekingsRegels
- * @property array|null $inkoopboekingBoekingsRegels
- * @property array|null $verkoopboekingBoekingsRegels
- * @property array|null $btwBoekingsregels
+ * @property \Illuminate\Support\Collection<int, GrootboekBoekingsRegel>|null $grootboekBoekingsRegels
+ * @property \Illuminate\Support\Collection<int, BoekingVerantwoordingsRegel>|null $inkoopboekingBoekingsRegels
+ * @property \Illuminate\Support\Collection<int, BoekingVerantwoordingsRegel>|null $verkoopboekingBoekingsRegels
+ * @property \Illuminate\Support\Collection<int, BtwBoekingsRegel>|null $btwBoekingsregels
  * @property float|null $bedragUitgegeven
  * @property float|null $bedragOntvangen
- * @property array|null $dagboek
+ * @property Identifier|null $dagboek
  * @property string|null $uri
  */
 class Kasboeking extends Model
@@ -47,6 +51,14 @@ class Kasboeking extends Model
         'bedragUitgegeven',
         'bedragOntvangen',
         'dagboek',
+    ];
+
+    protected static array $casts = [
+        'dagboek' => Identifier::class,
+        'grootboekBoekingsRegels' => [GrootboekBoekingsRegel::class],
+        'inkoopboekingBoekingsRegels' => [BoekingVerantwoordingsRegel::class],
+        'verkoopboekingBoekingsRegels' => [BoekingVerantwoordingsRegel::class],
+        'btwBoekingsregels' => [BtwBoekingsRegel::class],
     ];
 
     use CanCreate;

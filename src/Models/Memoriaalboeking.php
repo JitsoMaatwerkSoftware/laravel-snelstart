@@ -7,6 +7,9 @@ use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
+use Jitso\LaravelSnelstart\DataObjects\BoekingVerantwoordingsRegel;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
+use Jitso\LaravelSnelstart\DataObjects\MemoriaalBoekingsRegel;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -17,10 +20,10 @@ use Jitso\LaravelSnelstart\Model;
  * @property string|null $boekstuk
  * @property bool|null $gewijzigdDoorAccountant
  * @property string|null $omschrijving
- * @property array|null $memoriaalBoekingsRegels
- * @property array|null $inkoopboekingBoekingsRegels
- * @property array|null $verkoopboekingBoekingsRegels
- * @property array|null $dagboek
+ * @property \Illuminate\Support\Collection<int, MemoriaalBoekingsRegel>|null $memoriaalBoekingsRegels
+ * @property \Illuminate\Support\Collection<int, BoekingVerantwoordingsRegel>|null $inkoopboekingBoekingsRegels
+ * @property \Illuminate\Support\Collection<int, BoekingVerantwoordingsRegel>|null $verkoopboekingBoekingsRegels
+ * @property Identifier|null $dagboek
  * @property string|null $uri
  */
 class Memoriaalboeking extends Model
@@ -45,6 +48,13 @@ class Memoriaalboeking extends Model
     protected static array $required = [
         'datum',
         'dagboek',
+    ];
+
+    protected static array $casts = [
+        'dagboek' => Identifier::class,
+        'memoriaalBoekingsRegels' => [MemoriaalBoekingsRegel::class],
+        'inkoopboekingBoekingsRegels' => [BoekingVerantwoordingsRegel::class],
+        'verkoopboekingBoekingsRegels' => [BoekingVerantwoordingsRegel::class],
     ];
 
     public static function endpoint(): string

@@ -4,6 +4,7 @@ namespace Jitso\LaravelSnelstart\Models;
 
 use Jitso\LaravelSnelstart\Concerns\CanCreate;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
+use Jitso\LaravelSnelstart\DataObjects\Rgs;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -16,7 +17,7 @@ use Jitso\LaravelSnelstart\Model;
  * @property int|null $nummer
  * @property string|null $grootboekfunctie
  * @property string|null $grootboekRubriek
- * @property array|null $rgsCode
+ * @property \Illuminate\Support\Collection<int, Rgs>|null $rgsCode
  * @property array|null $btwSoort
  * @property string|null $vatRateCode
  * @property string|null $uri
@@ -37,6 +38,10 @@ class Grootboek extends Model
     ];
 
     protected static array $required = [];
+
+    protected static array $casts = [
+        'rgsCode' => [Rgs::class],
+    ];
 
     protected static bool $supportsOData = true;
 

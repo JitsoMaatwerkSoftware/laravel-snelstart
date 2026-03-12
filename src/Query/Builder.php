@@ -6,6 +6,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Jitso\LaravelSnelstart\Model;
 
+/**
+ * @template TModel of Model
+ */
 class Builder
 {
     private const OPERATOR_MAP = [
@@ -27,6 +30,7 @@ class Builder
 
     protected array $extraQuery = [];
 
+    /** @param TModel $model */
     public function __construct(
         protected Model $model,
     ) {}
@@ -108,6 +112,7 @@ class Builder
         return $this;
     }
 
+    /** @return Collection<int, TModel> */
     public function get(): Collection
     {
         $data = $this->model::resolveClient()->get(
@@ -118,11 +123,13 @@ class Builder
         return collect($data)->map(fn (array $item) => $this->model->newInstance($item));
     }
 
+    /** @return TModel|null */
     public function first(): ?Model
     {
         return $this->take(1)->get()->first();
     }
 
+    /** @return LazyCollection<int, TModel> */
     public function paginate(int $perPage = 500): LazyCollection
     {
         return LazyCollection::make(function () use ($perPage) {
@@ -140,6 +147,7 @@ class Builder
         });
     }
 
+    /** @return TModel */
     public function firstOrCreate(array $extra = []): Model
     {
         $existing = $this->first();
@@ -151,6 +159,7 @@ class Builder
         return $this->model::create(array_merge($this->extractSearchAttributes(), $extra));
     }
 
+    /** @return TModel */
     public function firstOrNew(array $extra = []): Model
     {
         $existing = $this->first();
@@ -162,6 +171,7 @@ class Builder
         return new ($this->model::class)(array_merge($this->extractSearchAttributes(), $extra));
     }
 
+    /** @return TModel */
     public function updateOrCreate(array $update = []): Model
     {
         $existing = $this->first();

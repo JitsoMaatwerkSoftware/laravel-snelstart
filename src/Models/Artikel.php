@@ -9,6 +9,8 @@ use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\CanUpsert;
 use Jitso\LaravelSnelstart\DataObjects\CustomField;
+use Jitso\LaravelSnelstart\DataObjects\ExtraVeld;
+use Jitso\LaravelSnelstart\DataObjects\Identifier;
 use Jitso\LaravelSnelstart\Model;
 use Jitso\LaravelSnelstart\Query\Builder;
 
@@ -16,17 +18,17 @@ use Jitso\LaravelSnelstart\Query\Builder;
  * @property string|null $id
  * @property string|null $artikelcode
  * @property string|null $omschrijving
- * @property array|null $artikelOmzetgroep
+ * @property Identifier|null $artikelOmzetgroep
  * @property float|null $verkoopprijs
  * @property float|null $inkoopprijs
  * @property string|null $eenheid
  * @property string|null $modifiedOn
- * @property array|null $relatie
+ * @property Identifier|null $relatie
  * @property bool|null $isNonActief
  * @property bool|null $voorraadControle
  * @property float|null $technischeVoorraad
  * @property float|null $vrijeVoorraad
- * @property array|null $extraVelden
+ * @property \Illuminate\Support\Collection<int, ExtraVeld>|null $extraVelden
  * @property string|null $uri
  */
 class Artikel extends Model
@@ -45,6 +47,12 @@ class Artikel extends Model
     ];
 
     protected static array $required = [];
+
+    protected static array $casts = [
+        'artikelOmzetgroep' => Identifier::class,
+        'relatie' => Identifier::class,
+        'extraVelden' => [ExtraVeld::class],
+    ];
 
     use CanCreate;
     use CanDelete;
