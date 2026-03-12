@@ -8,6 +8,12 @@ trait HasAttributes
 
     protected array $original = [];
 
+    /** @var string[] Fields that can be set on this model. Empty means all fields allowed. */
+    protected static array $fillable = [];
+
+    /** @var string[] Fields required when creating this model. */
+    protected static array $required = [];
+
     public function getAttribute(string $key): mixed
     {
         return $this->attributes[$key] ?? null;
@@ -86,5 +92,37 @@ trait HasAttributes
     public function __unset(string $key): void
     {
         unset($this->attributes[$key]);
+    }
+
+    protected static function guardFillable(array $attributes): void
+    {
+        if (empty(static::$fillable)) {
+            return;
+        }
+
+        $unknown = array_diff(array_keys($attributes), static::$fillable);
+
+        if (! empty($unknown)) {
+            throw \Jitso\LaravelSnelstart\Exceptions\ValidationException::unknownFields(
+                class_basename(static::class),
+                array_values($unknown),
+            );
+        }
+    }
+
+    protected static function guardRequired(array $attributes): void
+    {
+        if (empty(static::$required)) {
+            return;
+        }
+
+        $missing = array_diff(static::$required, array_keys($attributes));
+
+        if (! empty($missing)) {
+            throw \Jitso\LaravelSnelstart\Exceptions\ValidationException::missingRequired(
+                class_basename(static::class),
+                array_values($missing),
+            );
+        }
     }
 }

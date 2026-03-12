@@ -6,6 +6,9 @@ trait CanCreate
 {
     public static function create(array $attributes): static
     {
+        static::guardFillable($attributes);
+        static::guardRequired($attributes);
+
         $data = static::resolveClient()->post(static::endpoint(), $attributes);
 
         return (new static)->fill($data)->syncOriginal()->setExists(true);

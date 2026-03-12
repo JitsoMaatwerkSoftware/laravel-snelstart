@@ -12,8 +12,40 @@ use Jitso\LaravelSnelstart\DataObjects\CustomField;
 use Jitso\LaravelSnelstart\Model;
 use Jitso\LaravelSnelstart\Query\Builder;
 
+/**
+ * @property string|null $id
+ * @property string|null $artikelcode
+ * @property string|null $omschrijving
+ * @property array|null $artikelOmzetgroep
+ * @property float|null $verkoopprijs
+ * @property float|null $inkoopprijs
+ * @property string|null $eenheid
+ * @property string|null $modifiedOn
+ * @property array|null $relatie
+ * @property bool|null $isNonActief
+ * @property bool|null $voorraadControle
+ * @property float|null $technischeVoorraad
+ * @property float|null $vrijeVoorraad
+ * @property array|null $extraVelden
+ * @property string|null $uri
+ */
 class Artikel extends Model
 {
+    protected static array $fillable = [
+        'artikelcode',
+        'omschrijving',
+        'artikelOmzetgroep',
+        'verkoopprijs',
+        'inkoopprijs',
+        'eenheid',
+        'relatie',
+        'isNonActief',
+        'voorraadControle',
+        'extraVelden',
+    ];
+
+    protected static array $required = [];
+
     use CanCreate;
     use CanDelete;
     use CanRead;

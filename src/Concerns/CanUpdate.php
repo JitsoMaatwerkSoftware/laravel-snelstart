@@ -6,6 +6,8 @@ trait CanUpdate
 {
     public function update(array $attributes = []): static
     {
+        static::guardFillable($attributes);
+
         $this->fill($attributes);
         $data = static::resolveClient()->put(static::endpoint()."/{$this->getKey()}", $this->toArray());
 

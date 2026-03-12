@@ -6,6 +6,14 @@ use Illuminate\Support\Collection;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Model;
 
+/**
+ * @property string|null $id
+ * @property string|null $parentIdentifier
+ * @property string|null $fileName
+ * @property bool|null $readOnly
+ * @property string|null $content
+ * @property string|null $uri
+ */
 class Document extends Model
 {
     use CanRead;

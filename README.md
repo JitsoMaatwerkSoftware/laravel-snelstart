@@ -258,6 +258,41 @@ $response = Snelstart::put('artikelen/uuid', [...]);
 Snelstart::delete('artikelen/uuid');
 ```
 
+### Validation
+
+Write models validate attributes at runtime. Each model defines which fields are `$fillable` (allowed) and which are `$required` (mandatory on create). A `ValidationException` is thrown when constraints are violated.
+
+```php
+use Jitso\LaravelSnelstart\Models\Verkoopboeking;
+use Jitso\LaravelSnelstart\Exceptions\ValidationException;
+
+try {
+    // Missing required fields → ValidationException
+    Verkoopboeking::create([
+        'omschrijving' => 'Test',
+    ]);
+} catch (ValidationException $e) {
+    // "Verkoopboeking: missing required fields: factuurnummer, klant, boekingsregels"
+    $e->errors; // ['factuurnummer' => ['This field is required.'], ...]
+}
+
+try {
+    // Unknown field → ValidationException
+    Verkoopboeking::create([
+        'factuurnummer' => 'F-001',
+        'klant' => ['id' => '...'],
+        'boekingsregels' => [...],
+        'nietBestaandVeld' => 'oops',
+    ]);
+} catch (ValidationException $e) {
+    // "Verkoopboeking: unknown fields: nietBestaandVeld"
+}
+```
+
+Validation runs on both `create()` and `update()`. The `update()` method only checks fillable (not required), since partial updates are common.
+
+All models expose their fields via `@property` PHPDoc annotations, so your IDE will autocomplete available field names when constructing arrays for `create()` and `update()`.
+
 ### Error handling
 
 The package throws specific exceptions based on HTTP status codes:
@@ -273,7 +308,7 @@ try {
 } catch (NotFoundException $e) {
     // 404
 } catch (ValidationException $e) {
-    // 400 -- access field errors via $e->errors
+    // 400 or local validation -- access field errors via $e->errors
 } catch (AuthenticationException $e) {
     // 401 / 403
 } catch (SnelstartException $e) {
