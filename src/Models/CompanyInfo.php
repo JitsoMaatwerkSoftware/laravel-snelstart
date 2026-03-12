@@ -2,17 +2,12 @@
 
 namespace Jitso\LaravelSnelstart\Models;
 
+use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Model;
 
 class CompanyInfo extends Model
 {
-    protected static bool $canCreate = false;
-
-    protected static bool $canUpdate = true;
-
-    protected static bool $canDelete = false;
-
-    protected static bool $supportsOData = false;
+    use CanRead;
 
     public static function endpoint(): string
     {

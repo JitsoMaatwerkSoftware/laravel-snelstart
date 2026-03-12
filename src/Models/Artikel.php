@@ -3,17 +3,22 @@
 namespace Jitso\LaravelSnelstart\Models;
 
 use Illuminate\Support\Collection;
+use Jitso\LaravelSnelstart\Concerns\CanCreate;
+use Jitso\LaravelSnelstart\Concerns\CanDelete;
+use Jitso\LaravelSnelstart\Concerns\CanRead;
+use Jitso\LaravelSnelstart\Concerns\CanUpdate;
+use Jitso\LaravelSnelstart\Concerns\CanUpsert;
 use Jitso\LaravelSnelstart\DataObjects\CustomField;
 use Jitso\LaravelSnelstart\Model;
 use Jitso\LaravelSnelstart\Query\Builder;
 
 class Artikel extends Model
 {
-    protected static bool $canCreate = true;
-
-    protected static bool $canUpdate = true;
-
-    protected static bool $canDelete = true;
+    use CanCreate;
+    use CanDelete;
+    use CanRead;
+    use CanUpdate;
+    use CanUpsert;
 
     protected static bool $supportsOData = true;
 

@@ -7,21 +7,16 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Jitso\LaravelSnelstart\Client\SnelstartClient;
+use Jitso\LaravelSnelstart\Concerns\CanCreate;
+use Jitso\LaravelSnelstart\Concerns\CanUpdate;
 use Jitso\LaravelSnelstart\Concerns\HasAttributes;
-use Jitso\LaravelSnelstart\Concerns\HasCrud;
 use Jitso\LaravelSnelstart\Concerns\HasTimestamps;
+use Jitso\LaravelSnelstart\Query\Builder;
 
 abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
     use HasAttributes;
-    use HasCrud;
     use HasTimestamps;
-
-    protected static bool $canCreate = false;
-
-    protected static bool $canUpdate = false;
-
-    protected static bool $canDelete = false;
 
     protected static bool $supportsOData = false;
 
@@ -71,6 +66,36 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
     public function newInstance(array $attributes = []): static
     {
         return (new static($attributes))->syncOriginal()->setExists(true);
+    }
+
+    public function save(): static
+    {
+        $uses = class_uses_recursive(static::class);
+
+        if ($this->exists && isset($uses[CanUpdate::class])) {
+            return $this->update();
+        }
+
+        if (! $this->exists && isset($uses[CanCreate::class])) {
+            $data = static::resolveClient()->post(static::endpoint(), $this->toArray());
+
+            return $this->fill($data)->syncOriginal()->setExists(true);
+        }
+
+        throw new \BadMethodCallException(
+            static::class.' does not support '.($this->exists ? 'updating' : 'creating').'.',
+        );
+    }
+
+    public static function buildSearchQuery(array $search): Builder
+    {
+        $builder = static::query();
+
+        foreach ($search as $field => $value) {
+            $builder->where($field, $value);
+        }
+
+        return $builder;
     }
 
     // ArrayAccess

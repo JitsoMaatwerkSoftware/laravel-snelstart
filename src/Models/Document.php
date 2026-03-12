@@ -3,17 +3,12 @@
 namespace Jitso\LaravelSnelstart\Models;
 
 use Illuminate\Support\Collection;
+use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Model;
 
 class Document extends Model
 {
-    protected static bool $canCreate = true;
-
-    protected static bool $canUpdate = true;
-
-    protected static bool $canDelete = true;
-
-    protected static bool $supportsOData = false;
+    use CanRead;
 
     public static function endpoint(): string
     {

@@ -140,9 +140,66 @@ class Builder
         });
     }
 
+    public function firstOrCreate(array $extra = []): Model
+    {
+        $existing = $this->first();
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        return $this->model::create(array_merge($this->extractSearchAttributes(), $extra));
+    }
+
+    public function firstOrNew(array $extra = []): Model
+    {
+        $existing = $this->first();
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        return new ($this->model::class)(array_merge($this->extractSearchAttributes(), $extra));
+    }
+
+    public function updateOrCreate(array $update = []): Model
+    {
+        $existing = $this->first();
+
+        if ($existing !== null) {
+            return $existing->update($update);
+        }
+
+        return $this->model::create(array_merge($this->extractSearchAttributes(), $update));
+    }
+
     public function count(): int
     {
         return $this->get()->count();
+    }
+
+    /**
+     * Extracts key-value pairs from simple equality filters
+     * for use in create/update fallbacks.
+     */
+    protected function extractSearchAttributes(): array
+    {
+        $attributes = [];
+
+        foreach ($this->filters as $filter) {
+            if (preg_match("/^(\w+)\s+eq\s+'([^']*)'$/", $filter, $matches)) {
+                $attributes[$matches[1]] = str_replace("''", "'", $matches[2]);
+            } elseif (preg_match('/^(\w+)\s+eq\s+(true|false|null|\d+(?:\.\d+)?)$/', $filter, $matches)) {
+                $attributes[$matches[1]] = match ($matches[2]) {
+                    'true' => true,
+                    'false' => false,
+                    'null' => null,
+                    default => str_contains($matches[2], '.') ? (float) $matches[2] : (int) $matches[2],
+                };
+            }
+        }
+
+        return $attributes;
     }
 
     protected function buildQuery(): array

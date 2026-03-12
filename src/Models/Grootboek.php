@@ -2,15 +2,14 @@
 
 namespace Jitso\LaravelSnelstart\Models;
 
+use Jitso\LaravelSnelstart\Concerns\CanCreate;
+use Jitso\LaravelSnelstart\Concerns\CanRead;
 use Jitso\LaravelSnelstart\Model;
 
 class Grootboek extends Model
 {
-    protected static bool $canCreate = true;
-
-    protected static bool $canUpdate = false;
-
-    protected static bool $canDelete = false;
+    use CanCreate;
+    use CanRead;
 
     protected static bool $supportsOData = true;
 

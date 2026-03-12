@@ -108,6 +108,42 @@ $alleRelaties = Relatie::query()->paginate(500);
 
 **Supported operators:** `=`, `!=`, `>`, `>=`, `<`, `<=`, or pass OData operators directly (`eq`, `ne`, `gt`, `ge`, `lt`, `le`).
 
+### firstOrCreate / updateOrCreate
+
+Find-or-create and upsert patterns, just like Eloquent:
+
+```php
+use Jitso\LaravelSnelstart\Models\Relatie;
+use Jitso\LaravelSnelstart\Models\Artikel;
+
+// Find by attributes, or create with extra data
+$relatie = Relatie::firstOrCreate(
+    ['naam' => 'Jitso B.V.'],
+    ['email' => 'info@jitso.nl', 'telefoon' => '0612345678'],
+);
+
+// Find by attributes, update if found, create if not
+$artikel = Artikel::updateOrCreate(
+    ['artikelcode' => 'PROD-001'],
+    ['omschrijving' => 'Updated product', 'verkoopprijs' => 39.95],
+);
+
+// Get an unsaved instance if not found (useful for forms)
+$artikel = Artikel::firstOrNew(['artikelcode' => 'NIEUW']);
+$artikel->omschrijving = 'Handmatig ingevuld';
+$artikel->save();
+
+// Find by ID with fallback to empty instance
+$artikel = Artikel::findOrNew('possibly-invalid-uuid');
+
+// Also works via the query builder
+$relatie = Relatie::where('naam', 'Jitso B.V.')
+    ->firstOrCreate(['email' => 'info@jitso.nl']);
+
+$artikel = Artikel::where('artikelcode', 'PROD-001')
+    ->updateOrCreate(['verkoopprijs' => 49.95]);
+```
+
 ### Sub-resources
 
 Some models expose related resources as methods:
@@ -246,6 +282,16 @@ try {
 ```
 
 ## Available models
+
+Each model only exposes the methods its API endpoint actually supports. Your IDE autocompletion will only show relevant methods.
+
+| Capability | Traits | Methods |
+|---|---|---|
+| Read | `CanRead` | `all()`, `find()`, `findOrNew()`, `query()`, `where()`, `take()`, `skip()`, `filter()` |
+| Create | `CanCreate` | `create()`, `firstOrCreate()`, `firstOrNew()` |
+| Update | `CanUpdate` | `update()` |
+| Delete | `CanDelete` | `delete()` |
+| Upsert | `CanUpsert` | `updateOrCreate()` |
 
 ### Full CRUD + OData
 
