@@ -1,0 +1,6 @@
+vendor/
+composer.lock
+snelstart-api.yaml
+.idea/
+.DS_Store
+.phpunit.result.cache

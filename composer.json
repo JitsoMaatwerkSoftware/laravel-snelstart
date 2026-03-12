@@ -1,0 +1,44 @@
+{
+    "name": "jitso/laravel-snelstart",
+    "description": "Laravel package for the Snelstart B2B API v2 with Eloquent-like models",
+    "keywords": ["laravel", "snelstart", "api", "b2b", "boekhouding"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jitso",
+            "email": "info@jitso.nl"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0",
+        "illuminate/support": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jitso\\LaravelSnelstart\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jitso\\LaravelSnelstart\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jitso\\LaravelSnelstart\\SnelstartServiceProvider"
+            ],
+            "aliases": {
+                "Snelstart": "Jitso\\LaravelSnelstart\\Facades\\Snelstart"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
