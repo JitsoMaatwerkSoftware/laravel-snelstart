@@ -69,7 +69,7 @@ trait HasAttributes
         return $this->attributes;
     }
 
-    public function toJson(int $options = 0): string
+    public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
     }

@@ -18,16 +18,16 @@ class Document extends Model
 {
     use CanRead;
 
+    protected static array $fillable = [
+        'parentIdentifier',
+        'fileName',
+        'readOnly',
+        'content',
+    ];
+
     public static function endpoint(): string
     {
         return 'documenten';
-    }
-
-    public static function find(string $id): static
-    {
-        $data = static::resolveClient()->get(static::endpoint()."/{$id}");
-
-        return (new static)->fill($data)->syncOriginal()->setExists(true);
     }
 
     /** @return Collection<int, static> */
