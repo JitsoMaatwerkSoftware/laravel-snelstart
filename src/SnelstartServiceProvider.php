@@ -17,6 +17,7 @@ class SnelstartServiceProvider extends ServiceProvider
                 tokenUrl: config('snelstart.token_url'),
                 clientKey: config('snelstart.client_key'),
                 clientSecret: config('snelstart.client_secret'),
+                authType: config('snelstart.authentication_type', 'oauth'),
                 cacheToken: config('snelstart.cache_token', true),
             );
         });

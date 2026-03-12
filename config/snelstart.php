@@ -14,11 +14,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | OAuth2 Client Credentials
+    | Authentication Type
     |--------------------------------------------------------------------------
     |
-    | Client key and secret for the OAuth2 client credentials flow used
-    | to obtain Bearer tokens from the Snelstart auth server.
+    | Supported: "oauth", "clientkey"
+    |
+    | "oauth"     — Uses the OAuth2 client credentials flow (requires
+    |               both client_key and client_secret).
+    | "clientkey" — Uses the simpler clientkey grant (requires only
+    |               client_key).
+    |
+    */
+    'authentication_type' => env('SNELSTART_AUTH_TYPE', 'oauth'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Client Credentials
+    |--------------------------------------------------------------------------
+    |
+    | client_key is required for both authentication types.
+    | client_secret is only required when authentication_type is "oauth".
     |
     */
     'client_key' => env('SNELSTART_CLIENT_KEY'),

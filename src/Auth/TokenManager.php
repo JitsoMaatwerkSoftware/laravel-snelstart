@@ -15,7 +15,8 @@ class TokenManager
     public function __construct(
         private readonly string $tokenUrl,
         private readonly string $clientKey,
-        private readonly string $clientSecret,
+        private readonly ?string $clientSecret = null,
+        private readonly string $authType = 'oauth',
         private readonly bool $cacheToken = true,
     ) {}
 
@@ -35,15 +36,11 @@ class TokenManager
 
     private function fetchToken(): string
     {
-        $response = Http::asForm()->post($this->tokenUrl, [
-            'grant_type' => 'client_credentials',
-            'client_id' => $this->clientKey,
-            'client_secret' => $this->clientSecret,
-        ]);
+        $response = Http::asForm()->post($this->tokenUrl, $this->buildTokenParams());
 
         if ($response->failed()) {
             throw new AuthenticationException(
-                message: 'Failed to obtain Snelstart OAuth2 token: '.$response->body(),
+                message: 'Failed to obtain Snelstart access token: '.$response->body(),
                 code: $response->status(),
                 response: $response,
             );
@@ -53,13 +50,28 @@ class TokenManager
 
         if (! isset($data['access_token'])) {
             throw new AuthenticationException(
-                message: 'Snelstart OAuth2 response did not contain an access_token',
+                message: 'Snelstart token response did not contain an access_token',
                 code: $response->status(),
                 response: $response,
             );
         }
 
         return $data['access_token'];
+    }
+
+    private function buildTokenParams(): array
+    {
+        return match ($this->authType) {
+            'clientkey' => [
+                'grant_type' => 'clientkey',
+                'clientkey' => $this->clientKey,
+            ],
+            default => [
+                'grant_type' => 'client_credentials',
+                'client_id' => $this->clientKey,
+                'client_secret' => $this->clientSecret,
+            ],
+        };
     }
 
     private function getCacheTtl(): int

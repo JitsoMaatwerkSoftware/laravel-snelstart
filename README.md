@@ -31,13 +31,33 @@ SNELSTART_CLIENT_KEY=your-oauth2-client-id
 SNELSTART_CLIENT_SECRET=your-oauth2-client-secret
 ```
 
+### Authentication type
+
+The package supports two authentication methods. Set `SNELSTART_AUTH_TYPE` in your `.env`:
+
+**OAuth2 (default)** -- uses `client_credentials` grant with client key + secret:
+
+```dotenv
+SNELSTART_AUTH_TYPE=oauth
+SNELSTART_CLIENT_KEY=your-client-id
+SNELSTART_CLIENT_SECRET=your-client-secret
+```
+
+**Client Key** -- uses the simpler `clientkey` grant with only a client key:
+
+```dotenv
+SNELSTART_AUTH_TYPE=clientkey
+SNELSTART_CLIENT_KEY=your-client-key
+```
+
 ### All config options
 
 | Key | Env variable | Default |
 |-----|-------------|---------|
 | `subscription_key` | `SNELSTART_SUBSCRIPTION_KEY` | — |
+| `authentication_type` | `SNELSTART_AUTH_TYPE` | `oauth` |
 | `client_key` | `SNELSTART_CLIENT_KEY` | — |
-| `client_secret` | `SNELSTART_CLIENT_SECRET` | — |
+| `client_secret` | `SNELSTART_CLIENT_SECRET` | — (only for `oauth`) |
 | `base_url` | `SNELSTART_BASE_URL` | `https://b2bapi.snelstart.nl/v2` |
 | `token_url` | `SNELSTART_TOKEN_URL` | `https://auth.snelstart.nl/b2b/token` |
 | `cache_token` | `SNELSTART_CACHE_TOKEN` | `true` |
