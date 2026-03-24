@@ -13,6 +13,7 @@ use Jitso\LaravelSnelstart\DataObjects\CustomField;
 use Jitso\LaravelSnelstart\DataObjects\EmailVersturen;
 use Jitso\LaravelSnelstart\DataObjects\ExtraVeld;
 use Jitso\LaravelSnelstart\DataObjects\Identifier;
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -157,5 +158,20 @@ class Relatie extends Model
             static::endpoint()."/{$this->getKey()}/customFields",
             $fields,
         );
+    }
+
+    /**
+     * File documents from the documenten API (not the {@see $documents} identifier list on the relatie resource).
+     *
+     * @return Collection<int, Document>
+     */
+    public function documentFiles(): Collection
+    {
+        $key = $this->getKey();
+        if ($key === null) {
+            return collect();
+        }
+
+        return Document::forParentType(DocumentParentType::Relatie, $key);
     }
 }

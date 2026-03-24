@@ -4,6 +4,7 @@ namespace Jitso\LaravelSnelstart\Models;
 
 use Illuminate\Support\Collection;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -35,7 +36,13 @@ class Document extends Model
     {
         $data = static::resolveClient()->get(static::endpoint()."/{$documentType}/{$parentId}");
 
-        return collect($data)->map(fn (array $item) => (new static)->fill($item)->syncOriginal()->setExists(true));
+        return static::mapListResponse($data);
+    }
+
+    /** @return Collection<int, static> */
+    public static function forParentType(DocumentParentType $type, string $parentId): Collection
+    {
+        return static::forParent($type->value, $parentId);
     }
 
     public static function createForType(string $documentType, array $data): static
@@ -43,6 +50,48 @@ class Document extends Model
         $response = static::resolveClient()->post(static::endpoint()."/{$documentType}", $data);
 
         return (new static)->fill($response)->syncOriginal()->setExists(true);
+    }
+
+    public static function createForParentType(DocumentParentType $type, array $data): static
+    {
+        return static::createForType($type->value, $data);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload  Merged with parentIdentifier; other keys per API (e.g. document kind).
+     */
+    public static function createForVerkooporder(string $orderId, array $payload = []): static
+    {
+        return static::createForParentType(
+            DocumentParentType::Verkooporder,
+            array_merge(['parentIdentifier' => $orderId], $payload),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public static function createForOfferte(string $offerteId, array $payload = []): static
+    {
+        return static::createForParentType(
+            DocumentParentType::Offerte,
+            array_merge(['parentIdentifier' => $offerteId], $payload),
+        );
+    }
+
+    /**
+     * Decodes {@see $content} when it is standard base64; returns null if missing or invalid.
+     */
+    public function decodedContent(): ?string
+    {
+        $raw = $this->getAttribute('content');
+        if (! is_string($raw) || $raw === '') {
+            return null;
+        }
+
+        $decoded = base64_decode($raw, true);
+
+        return $decoded === false ? null : $decoded;
     }
 
     public function update(array $attributes = []): static
@@ -59,5 +108,18 @@ class Document extends Model
         $this->exists = false;
 
         return true;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>|mixed  $data
+     * @return Collection<int, static>
+     */
+    protected static function mapListResponse(mixed $data): Collection
+    {
+        if (! is_array($data)) {
+            return collect();
+        }
+
+        return collect($data)->map(fn (array $item) => (new static)->fill($item)->syncOriginal()->setExists(true));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Jitso\LaravelSnelstart\Models;
 
+use Illuminate\Support\Collection;
 use Jitso\LaravelSnelstart\Concerns\CanCreate;
 use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
@@ -11,6 +12,7 @@ use Jitso\LaravelSnelstart\DataObjects\Adres;
 use Jitso\LaravelSnelstart\DataObjects\ExtraVeld;
 use Jitso\LaravelSnelstart\DataObjects\Identifier;
 use Jitso\LaravelSnelstart\DataObjects\VerkooporderRegel;
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -100,5 +102,16 @@ class Verkooporder extends Model
             static::endpoint()."/{$this->getKey()}/ProcesStatus",
             ['id' => $this->getKey(), 'procesStatus' => $status],
         );
+    }
+
+    /** @return Collection<int, Document> */
+    public function documents(): Collection
+    {
+        $key = $this->getKey();
+        if ($key === null) {
+            return collect();
+        }
+
+        return Document::forParentType(DocumentParentType::Verkooporder, $key);
     }
 }

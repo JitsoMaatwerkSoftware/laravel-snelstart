@@ -2,6 +2,7 @@
 
 namespace Jitso\LaravelSnelstart\Models;
 
+use Illuminate\Support\Collection;
 use Jitso\LaravelSnelstart\Concerns\CanCreate;
 use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
@@ -10,6 +11,7 @@ use Jitso\LaravelSnelstart\Concerns\CanUpsert;
 use Jitso\LaravelSnelstart\DataObjects\Adres;
 use Jitso\LaravelSnelstart\DataObjects\Identifier;
 use Jitso\LaravelSnelstart\DataObjects\VerkooporderRegel;
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -83,5 +85,16 @@ class Offerte extends Model
     public static function endpoint(): string
     {
         return 'offertes';
+    }
+
+    /** @return Collection<int, Document> */
+    public function documents(): Collection
+    {
+        $key = $this->getKey();
+        if ($key === null) {
+            return collect();
+        }
+
+        return Document::forParentType(DocumentParentType::Offerte, $key);
     }
 }

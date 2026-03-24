@@ -215,18 +215,63 @@ $balans = Rapportage::kolommenbalans();
 $periode = Rapportage::periodebalans(['boekjaar' => 2025]);
 ```
 
-**Documents:**
+**Documents & export (werkbon, pakbon, orderbevestiging, factuur):**
+
+The B2B API exposes attachments and generated files under `documenten/{documentType}/{parentId}`. The exact path segment for each parent type and the POST body for creating or regenerating a document **must match the [Snelstart B2B developer portal](https://b2bapi-developer.snelstart.nl/)** for your subscription.
 
 ```php
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
+use Jitso\LaravelSnelstart\Enums\OrderDocumentSoort;
 use Jitso\LaravelSnelstart\Models\Document;
 
 $doc = Document::find('uuid');
 $docs = Document::forParent('VerkoopBoeking', 'parent-uuid');
+$docs = Document::forParentType(DocumentParentType::VerkoopBoeking, 'parent-uuid');
+
 $doc = Document::createForType('VerkoopBoeking', [
     'parentIdentifier' => 'parent-uuid',
     'fileName' => 'factuur.pdf',
     'content' => base64_encode($pdfContent),
 ]);
+
+// Verkooporder / offerte: merge extra fields from the API spec (document kind, template, etc.)
+Document::createForVerkooporder($orderId, [
+    // e.g. fields required to create a werkbon / pakbon / orderbevestiging — see portal
+    // 'someDocumentKindField' => OrderDocumentSoort::Werkbon->value,
+]);
+```
+
+**Models with document helpers:**
+
+```php
+$order = Verkooporder::find('uuid');
+foreach ($order->documents() as $document) {
+    $binary = $document->decodedContent(); // base64 → string, or null
+}
+
+$offerte = Offerte::find('uuid');
+$offerte->documents();
+
+// Relatie and Verkoopboeking expose a `documents` attribute (identifiers); file rows from documenten/ use:
+$relatie->documentFiles();
+Verkoopboeking::find('uuid')->documentFiles();
+```
+
+**Verkoopfactuur — UBL, PDF, and documenten:**
+
+```php
+$factuur = Verkoopfactuur::find('uuid');
+$ubl = $factuur->ubl();              // JSON (existing)
+$pdf = $factuur->pdf();              // raw bytes if GET …/pdf exists for your API version
+$files = $factuur->documents();      // Document models via documenten/VerkoopFactuur/{id}
+```
+
+**Raw HTTP body (e.g. custom export endpoints):**
+
+```php
+use Jitso\LaravelSnelstart\Facades\Snelstart;
+
+$bytes = Snelstart::getBody('some/path', [], ['Accept' => 'application/pdf']);
 ```
 
 **Verkooporder processtatus:**
@@ -256,15 +301,6 @@ $aangifte = BtwAangifte::find('uuid');
 $aangifte->externAangeven(true);
 ```
 
-**Verkoopfactuur -- UBL export:**
-
-```php
-use Jitso\LaravelSnelstart\Models\Verkoopfactuur;
-
-$factuur = Verkoopfactuur::find('uuid');
-$ubl = $factuur->ubl();
-```
-
 ### Using the Facade
 
 For direct API access without models:
@@ -273,6 +309,7 @@ For direct API access without models:
 use Jitso\LaravelSnelstart\Facades\Snelstart;
 
 $response = Snelstart::get('artikelen', ['$top' => 10]);
+$raw = Snelstart::getBody('custom/export/path');
 $response = Snelstart::post('artikelen', ['artikelcode' => 'NEW']);
 $response = Snelstart::put('artikelen/uuid', [...]);
 Snelstart::delete('artikelen/uuid');

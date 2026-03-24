@@ -55,6 +55,20 @@ class SnelstartClient
         return true;
     }
 
+    /**
+     * Raw response body (e.g. PDF or XML) without forcing JSON Accept.
+     *
+     * @param  array<string, string>  $headers
+     */
+    public function getBody(string $endpoint, array $query = [], array $headers = []): string
+    {
+        $response = $this->plainRequest($headers)->get($this->url($endpoint), $query);
+
+        $this->handleErrors($response);
+
+        return $response->body();
+    }
+
     private function request(): PendingRequest
     {
         return Http::withHeaders([
@@ -62,6 +76,17 @@ class SnelstartClient
         ])->withToken($this->tokenManager->getToken())
             ->acceptJson()
             ->contentType('application/json');
+    }
+
+    /**
+     * @param  array<string, string>  $headers
+     */
+    private function plainRequest(array $headers = []): PendingRequest
+    {
+        return Http::withHeaders(array_merge([
+            'Ocp-Apim-Subscription-Key' => $this->subscriptionKey,
+        ], $headers))
+            ->withToken($this->tokenManager->getToken());
     }
 
     private function url(string $endpoint): string
