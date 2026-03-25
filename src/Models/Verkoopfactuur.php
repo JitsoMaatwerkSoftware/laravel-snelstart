@@ -40,7 +40,21 @@ class Verkoopfactuur extends Model
 
     public function ubl(): array
     {
-        return static::resolveClient()->get(static::endpoint()."/{$this->getKey()}/ubl");
+        $key = $this->requireKey();
+
+        return static::resolveClient()->get(static::endpoint()."/{$key}/ubl");
+    }
+
+    /**
+     * Raw UBL XML when the API returns XML from GET verkoopfacturen/{id}/ubl (use when {@see ubl()} is empty because the response is not JSON).
+     */
+    public function ublXml(): string
+    {
+        $key = $this->requireKey();
+
+        return static::resolveClient()->getBody(static::endpoint()."/{$key}/ubl", [], [
+            'Accept' => 'application/xml, text/xml, */*',
+        ]);
     }
 
     /**
@@ -48,7 +62,11 @@ class Verkoopfactuur extends Model
      */
     public function pdf(): string
     {
-        return static::resolveClient()->getBody(static::endpoint()."/{$this->getKey()}/pdf");
+        $key = $this->requireKey();
+
+        return static::resolveClient()->getBody(static::endpoint()."/{$key}/pdf", [], [
+            'Accept' => 'application/pdf, application/octet-stream, */*',
+        ]);
     }
 
     /** @return Collection<int, Document> */
@@ -60,5 +78,15 @@ class Verkoopfactuur extends Model
         }
 
         return Document::forParentType(DocumentParentType::VerkoopFactuur, $key);
+    }
+
+    private function requireKey(): string
+    {
+        $key = $this->getKey();
+        if ($key === null || $key === '') {
+            throw new \InvalidArgumentException('Verkoopfactuur must have a primary key (id) for this operation.');
+        }
+
+        return $key;
     }
 }

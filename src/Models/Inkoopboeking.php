@@ -2,6 +2,7 @@
 
 namespace Jitso\LaravelSnelstart\Models;
 
+use Illuminate\Support\Collection;
 use Jitso\LaravelSnelstart\Concerns\CanCreate;
 use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
@@ -10,6 +11,7 @@ use Jitso\LaravelSnelstart\Concerns\CanUpsert;
 use Jitso\LaravelSnelstart\DataObjects\BtwBoeking;
 use Jitso\LaravelSnelstart\DataObjects\Identifier;
 use Jitso\LaravelSnelstart\DataObjects\InkoopBoekingsRegel;
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -96,5 +98,20 @@ class Inkoopboeking extends Model
             static::endpoint().'/GetCreateFromAttachmentStatus',
             ['instanceId' => $instanceId],
         );
+    }
+
+    /**
+     * Rows from the documenten API (not the {@see $documents} identifier list on the boeking).
+     *
+     * @return Collection<int, Document>
+     */
+    public function documentFiles(): Collection
+    {
+        $key = $this->getKey();
+        if ($key === null) {
+            return collect();
+        }
+
+        return Document::forParentType(DocumentParentType::InkoopBoeking, $key);
     }
 }

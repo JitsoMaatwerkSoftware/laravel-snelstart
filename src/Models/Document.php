@@ -80,6 +80,28 @@ class Document extends Model
     }
 
     /**
+     * @param  array<string, mixed>  $payload
+     */
+    public static function createForVerkoopBoeking(string $boekingId, array $payload = []): static
+    {
+        return static::createForParentType(
+            DocumentParentType::VerkoopBoeking,
+            array_merge(['parentIdentifier' => $boekingId], $payload),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    public static function createForInkoopBoeking(string $boekingId, array $payload = []): static
+    {
+        return static::createForParentType(
+            DocumentParentType::InkoopBoeking,
+            array_merge(['parentIdentifier' => $boekingId], $payload),
+        );
+    }
+
+    /**
      * Decodes {@see $content} when it is standard base64; returns null if missing or invalid.
      */
     public function decodedContent(): ?string
@@ -111,7 +133,9 @@ class Document extends Model
     }
 
     /**
-     * @param  array<int, array<string, mixed>>|mixed  $data
+     * Normalizes JSON from GET documenten/{type}/{id}: OData `value`, a plain list, or one object.
+     *
+     * @param  mixed  $data
      * @return Collection<int, static>
      */
     protected static function mapListResponse(mixed $data): Collection
@@ -120,6 +144,22 @@ class Document extends Model
             return collect();
         }
 
-        return collect($data)->map(fn (array $item) => (new static)->fill($item)->syncOriginal()->setExists(true));
+        if (isset($data['value']) && is_array($data['value'])) {
+            return static::mapListResponse($data['value']);
+        }
+
+        if ($data === []) {
+            return collect();
+        }
+
+        if (array_is_list($data)) {
+            return collect($data)
+                ->filter(fn ($item) => is_array($item))
+                ->map(fn (array $item) => (new static)->fill($item)->syncOriginal()->setExists(true));
+        }
+
+        return collect([
+            (new static)->fill($data)->syncOriginal()->setExists(true),
+        ]);
     }
 }

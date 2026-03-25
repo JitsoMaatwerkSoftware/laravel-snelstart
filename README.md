@@ -239,7 +239,11 @@ Document::createForVerkooporder($orderId, [
     // e.g. fields required to create a werkbon / pakbon / orderbevestiging — see portal
     // 'someDocumentKindField' => OrderDocumentSoort::Werkbon->value,
 ]);
+Document::createForVerkoopBoeking($verkoopBoekingId, [...]);
+Document::createForInkoopBoeking($inkoopBoekingId, [...]);
 ```
+
+`Document::forParent` accepts a JSON array, OData `{ "value": [ ... ] }`, or a single document object; all are normalized to a collection of `Document` models.
 
 **Models with document helpers:**
 
@@ -252,16 +256,21 @@ foreach ($order->documents() as $document) {
 $offerte = Offerte::find('uuid');
 $offerte->documents();
 
-// Relatie and Verkoopboeking expose a `documents` attribute (identifiers); file rows from documenten/ use:
+// Relatie and Verkoopboeking / Inkoopboeking expose a `documents` attribute (identifiers); file rows from documenten/ use:
 $relatie->documentFiles();
 Verkoopboeking::find('uuid')->documentFiles();
+Inkoopboeking::find('uuid')->documentFiles();
+Memoriaalboeking::find('uuid')->documentFiles();
+Bankboeking::find('uuid')->documentFiles();
+Kasboeking::find('uuid')->documentFiles();
 ```
 
 **Verkoopfactuur — UBL, PDF, and documenten:**
 
 ```php
 $factuur = Verkoopfactuur::find('uuid');
-$ubl = $factuur->ubl();              // JSON (existing)
+$ubl = $factuur->ubl();              // JSON when the API returns application/json
+$ublXml = $factuur->ublXml();        // raw XML when /ubl returns XML instead of JSON
 $pdf = $factuur->pdf();              // raw bytes if GET …/pdf exists for your API version
 $files = $factuur->documents();      // Document models via documenten/VerkoopFactuur/{id}
 ```

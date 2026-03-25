@@ -2,6 +2,7 @@
 
 namespace Jitso\LaravelSnelstart\Models;
 
+use Illuminate\Support\Collection;
 use Jitso\LaravelSnelstart\Concerns\CanCreate;
 use Jitso\LaravelSnelstart\Concerns\CanDelete;
 use Jitso\LaravelSnelstart\Concerns\CanRead;
@@ -11,6 +12,7 @@ use Jitso\LaravelSnelstart\DataObjects\BoekingVerantwoordingsRegel;
 use Jitso\LaravelSnelstart\DataObjects\BtwBoekingsRegel;
 use Jitso\LaravelSnelstart\DataObjects\GrootboekBoekingsRegel;
 use Jitso\LaravelSnelstart\DataObjects\Identifier;
+use Jitso\LaravelSnelstart\Enums\DocumentParentType;
 use Jitso\LaravelSnelstart\Model;
 
 /**
@@ -72,5 +74,16 @@ class Kasboeking extends Model
     public static function endpoint(): string
     {
         return 'kasboekingen';
+    }
+
+    /** @return Collection<int, Document> */
+    public function documentFiles(): Collection
+    {
+        $key = $this->getKey();
+        if ($key === null) {
+            return collect();
+        }
+
+        return Document::forParentType(DocumentParentType::Kasboeking, $key);
     }
 }
