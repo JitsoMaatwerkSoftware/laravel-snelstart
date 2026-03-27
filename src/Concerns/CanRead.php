@@ -43,6 +43,12 @@ trait CanRead
     }
 
     /** @return Builder<static> */
+    public static function whereInteger(string $field, int $value): Builder
+    {
+        return static::query()->whereInteger($field, $value);
+    }
+
+    /** @return Builder<static> */
     public static function take(int $amount): Builder
     {
         return static::query()->take($amount);

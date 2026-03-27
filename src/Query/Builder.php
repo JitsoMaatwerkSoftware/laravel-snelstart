@@ -50,6 +50,17 @@ class Builder
         return $this;
     }
 
+    /**
+     * Equality filter with an OData integer literal (no quotes). Use when the API expects a numeric
+     * property and {@see where()} with a PHP string would produce a quoted string literal (e.g. `artikelcode eq '1'`).
+     */
+    public function whereInteger(string $field, int $value): static
+    {
+        $this->filters[] = "{$field} eq {$value}";
+
+        return $this;
+    }
+
     public function whereContains(string $field, string $value): static
     {
         $escaped = str_replace("'", "''", $value);
