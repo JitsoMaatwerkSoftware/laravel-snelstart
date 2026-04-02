@@ -5,7 +5,7 @@ A Laravel package for the [Snelstart B2B API v2](https://b2bapi.snelstart.nl/v2)
 ## Requirements
 
 - PHP 8.2+
-- Laravel 11 or 12
+- Laravel 11, 12, or 13
 
 ## Installation
 
@@ -127,6 +127,57 @@ $alleRelaties = Relatie::query()->paginate(500);
 ```
 
 **Supported operators:** `=`, `!=`, `>`, `>=`, `<`, `<=`, or pass OData operators directly (`eq`, `ne`, `gt`, `ge`, `lt`, `le`).
+
+**Numeric OData filters (e.g. artikelcode):** PHP strings are sent as OData string literals (`artikelcode eq '1'`). If the API treats the field as a number and returns HTTP 400, use an integer or `whereInteger`:
+
+```php
+Artikel::query()->where('artikelcode', (int) $code)->first();
+Artikel::whereInteger('artikelcode', (int) $code)->first();
+```
+
+You can also pass a raw filter: `Artikel::filter('artikelcode eq 1')->first();` (confirm field names and casing in the Snelstart API documentation).
+
+#### HTTP 400 and `ValidationException`
+
+The client maps **every** HTTP 400 response to `Jitso\LaravelSnelstart\Exceptions\ValidationException`. That includes OData/`$filter` problems on **GET** requests, not only validation on POST/PUT bodies. If the message looks generic, read the full API response:
+
+```php
+use Jitso\LaravelSnelstart\Exceptions\ValidationException;
+
+try {
+    Artikel::where('artikelcode', $code)->first();
+} catch (ValidationException $e) {
+    logger()->error('Snelstart 400', [
+        'message' => $e->getMessage(),
+        'errors' => $e->errors,
+        'body' => $e->response?->body(),
+        'json' => $e->response?->json(),
+    ]);
+    throw $e;
+}
+```
+
+The exception message now includes `detail` / raw body snippets when the API omits a clear `message` or `title`.
+
+#### Resolving artikel IDs without OData (workaround)
+
+If lookup by code keeps failing, cache fixed UUIDs in your app config (example pattern):
+
+```php
+// config/snelstart_order.php — example only
+'artikel_id_overrides' => [
+    '1' => '00000000-0000-0000-0000-000000000001',
+    '2' => '00000000-0000-0000-0000-000000000002',
+],
+```
+
+```php
+$id = config('snelstart_order.artikel_id_overrides')[$code] ?? null;
+if ($id !== null) {
+    return $id;
+}
+return Artikel::whereInteger('artikelcode', (int) $code)->first()?->id;
+```
 
 ### firstOrCreate / updateOrCreate
 
