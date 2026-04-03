@@ -35,6 +35,7 @@ class Artikel extends Model
 {
     protected static array $fillable = [
         'artikelcode',
+        'artikelCode',
         'omschrijving',
         'artikelOmzetgroep',
         'verkoopprijs',
@@ -61,6 +62,14 @@ class Artikel extends Model
     use CanUpsert;
 
     protected static bool $supportsOData = true;
+
+    public function resolveODataField(string $field): string
+    {
+        return match ($field) {
+            'artikelcode' => 'artikelCode',
+            default => $field,
+        };
+    }
 
     public static function endpoint(): string
     {

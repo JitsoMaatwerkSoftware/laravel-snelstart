@@ -135,7 +135,7 @@ Artikel::query()->where('artikelcode', (int) $code)->first();
 Artikel::whereInteger('artikelcode', (int) $code)->first();
 ```
 
-You can also pass a raw filter: `Artikel::filter('artikelcode eq 1')->first();` (confirm field names and casing in the Snelstart API documentation).
+You can also pass a raw filter: `Artikel::filter('artikelCode eq 1')->first();` (confirm field names and casing in the Snelstart API documentation).
 
 #### HTTP 400 and `ValidationException`
 

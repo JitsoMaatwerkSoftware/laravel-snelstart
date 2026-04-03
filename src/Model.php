@@ -87,6 +87,11 @@ abstract class Model implements Arrayable, ArrayAccess, Jsonable, JsonSerializab
         );
     }
 
+    public function resolveODataField(string $field): string
+    {
+        return $field;
+    }
+
     public static function buildSearchQuery(array $search): Builder
     {
         $builder = static::query();

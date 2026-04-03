@@ -45,7 +45,8 @@ class Builder
         $odataOperator = self::OPERATOR_MAP[$operator] ?? $operator;
         $formattedValue = $this->formatValue($value);
 
-        $this->filters[] = "{$field} {$odataOperator} {$formattedValue}";
+        $odataField = $this->model->resolveODataField($field);
+        $this->filters[] = "{$odataField} {$odataOperator} {$formattedValue}";
 
         return $this;
     }
@@ -56,7 +57,8 @@ class Builder
      */
     public function whereInteger(string $field, int $value): static
     {
-        $this->filters[] = "{$field} eq {$value}";
+        $odataField = $this->model->resolveODataField($field);
+        $this->filters[] = "{$odataField} eq {$value}";
 
         return $this;
     }
@@ -64,7 +66,8 @@ class Builder
     public function whereContains(string $field, string $value): static
     {
         $escaped = str_replace("'", "''", $value);
-        $this->filters[] = "contains({$field}, '{$escaped}')";
+        $odataField = $this->model->resolveODataField($field);
+        $this->filters[] = "contains({$odataField}, '{$escaped}')";
 
         return $this;
     }
@@ -72,7 +75,8 @@ class Builder
     public function whereStartsWith(string $field, string $value): static
     {
         $escaped = str_replace("'", "''", $value);
-        $this->filters[] = "startswith({$field}, '{$escaped}')";
+        $odataField = $this->model->resolveODataField($field);
+        $this->filters[] = "startswith({$odataField}, '{$escaped}')";
 
         return $this;
     }
@@ -80,7 +84,8 @@ class Builder
     public function whereEndsWith(string $field, string $value): static
     {
         $escaped = str_replace("'", "''", $value);
-        $this->filters[] = "endswith({$field}, '{$escaped}')";
+        $odataField = $this->model->resolveODataField($field);
+        $this->filters[] = "endswith({$odataField}, '{$escaped}')";
 
         return $this;
     }
